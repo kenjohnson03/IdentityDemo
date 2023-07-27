@@ -1,0 +1,31 @@
+﻿@page "/"
+
+@attribute [Authorize]
+
+
+<AuthorizeView>
+    <Authorized>
+        @foreach (var claim in context.User.Claims)
+        {
+            <p>@claim.ToString()</p>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <a href="MicrosoftIdentity/Account/SignIn">Log in</a>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    public Task<AuthenticationState>? AuthState { get; set; }
+    private AuthenticationState? authState;
+    private List<string> roles = new List<string>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthState != null)
+        {
+            authState = await AuthState;
+        }
+    }
+}
