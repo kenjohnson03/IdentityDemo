@@ -15,7 +15,9 @@ AzureEnvironment: "AzurePublicCloud" or "AzureUSGovernment"
 ## Setup LDAPQuery Function
 Environment Variables
 ```
-LDAP_Connection: "ldap://ds.example.com:389/dc=example,dc=com"
+LDAP_Path: "ldap://ds.example.com:389/dc=example,dc=com"
+LDAP_Username: "USERNAME_GOES_HERE"
+LDAP_Password: "PASSWORD_GOES_HERE"
 ```
 
 ## Setup IdentityDemo Blazor App

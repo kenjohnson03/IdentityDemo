@@ -9,6 +9,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.DirectoryServices;
 using ExampleClaimProviders.Models;
+using System.Reflection;
+using System.Text;
 
 namespace ExampleClaimProviders
 {
@@ -47,23 +49,41 @@ namespace ExampleClaimProviders
 
         private static string GetUPNFromLDAP(string userName)
         {
+            // Validate environment variables are set
+            MethodBase method = System.Reflection.MethodBase.GetCurrentMethod();
+            string methodName = method.Name;
+            string className = method.ReflectedType.Name;
+            string fullMethodName = className + "." + methodName;
+
+            var LDAPPath = Environment.GetEnvironmentVariable("LDAP_Path", EnvironmentVariableTarget.Process);
+            var LDAPUsername = Environment.GetEnvironmentVariable("LDAP_Username", EnvironmentVariableTarget.Process);
+            var LDAPPassword = Environment.GetEnvironmentVariable("LDAP_Password", EnvironmentVariableTarget.Process);
+
+            if (String.IsNullOrEmpty(LDAPPath) || String.IsNullOrEmpty(LDAPUsername) || String.IsNullOrEmpty(LDAPPassword))
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine($"{fullMethodName} Error: Missing required environment variables. Please check the following environment variables are set:");
+                sb.Append(String.IsNullOrEmpty(LDAPPath) ? "LDAP_Path\n" : "");
+                sb.Append(String.IsNullOrEmpty(LDAPUsername) ? "LDAP_Username\n" : "");
+                sb.Append(String.IsNullOrEmpty(LDAPPassword) ? "LDAP_Password\n" : "");
+                _logger.LogError(sb.ToString());
+                return null;
+            }
+
+
             string upn = string.Empty;
             if(string.IsNullOrEmpty(userName))
             {
-                _logger.LogError("userName is null or empty");
+                _logger.LogError($"{fullMethodName} Error: userName is null or empty.");
                 return upn;
             }
-            var connectionString = Environment.GetEnvironmentVariable("LDAP_Connection", EnvironmentVariableTarget.Process);
-            if(string.IsNullOrEmpty(connectionString))
-            {
-                _logger.LogError("LDAP_Connection environment variable not set");
-                return upn;
-            }            
+  
             try
             {
-                System.DirectoryServices.DirectoryEntry entry = new(connectionString);
-                DirectorySearcher searcher = new(entry);
+                System.DirectoryServices.DirectoryEntry entry = new DirectoryEntry(LDAPPath, LDAPUsername, LDAPPassword);
+                DirectorySearcher searcher = new DirectorySearcher(entry);
                 searcher.Filter = $"(&(objectClass=user)(mail={userName}))";
+                
                 SearchResultCollection results = searcher.FindAll();
                 foreach(SearchResult result in results)
                 {
@@ -77,9 +97,8 @@ namespace ExampleClaimProviders
             }
             catch(Exception ex)
             {
-                _logger.LogError(ex.Message);
-            }
-            
+                _logger.LogError($"{fullMethodName} Error:\n{ex.Message}");
+            }            
 
             return upn;
         }
