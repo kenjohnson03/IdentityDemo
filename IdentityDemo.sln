@@ -10,6 +10,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Readme.md = Readme.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExampleClaimProviders", "ExampleClaimProviders\ExampleClaimProviders.csproj", "{1D6CD0B6-F1E7-4D15-8D55-7C21239580C7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,6 +22,10 @@ Global
 		{56A52579-235E-4AFD-A911-77586AB3222D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{56A52579-235E-4AFD-A911-77586AB3222D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{56A52579-235E-4AFD-A911-77586AB3222D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D6CD0B6-F1E7-4D15-8D55-7C21239580C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D6CD0B6-F1E7-4D15-8D55-7C21239580C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D6CD0B6-F1E7-4D15-8D55-7C21239580C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D6CD0B6-F1E7-4D15-8D55-7C21239580C7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
