@@ -33,12 +33,57 @@ namespace ExampleClaimProviders
             string name = req.Query["name"];
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            _logger.LogInformation(requestBody);
             dynamic data = JsonConvert.DeserializeObject(requestBody);
             name = name ?? data?.name;
 
-            // Read the correlation ID from the Azure AD  request    
+            // Read the correlation ID from the Azure AD  request
+            /* Example request from Azure AD:
+            {
+                "type": "microsoft.graph.authenticationEvent.tokenIssuanceStart",
+                "source": "/tenants/<Your tenant GUID>/applications/<Your Test Application App Id>",
+                "data": {
+                    "@odata.type": "microsoft.graph.onTokenIssuanceStartCalloutData",
+                    "tenantId": "<Your tenant GUID>",
+                    "authenticationEventListenerId": "<GUID>",
+                    "customAuthenticationExtensionId": "<Your custom extension ID>",
+                    "authenticationContext": {
+                        "correlationId": "fcef74ef-29ea-42ca-b150-8f45c8f31ee6",
+                        "client": {
+                                        "ip": "127.0.0.1",
+                            "locale": "en-us",
+                            "market": "en-us"
+                        },
+                        "protocol": "OAUTH2.0",
+                        "clientServicePrincipal": {
+                            "id": "<Your Test Applications servicePrincipal objectId>",
+                            "appId": "<Your Test Application App Id>",
+                            "appDisplayName": "My Test application",
+                            "displayName": "My Test application"
+                        },
+                        "resourceServicePrincipal": {
+                            "id": "<Your Test Applications servicePrincipal objectId>",
+                            "appId": "<Your Test Application App Id>",
+                            "appDisplayName": "My Test application",
+                            "displayName": "My Test application"
+                        },
+                        "user": {
+                            "createdDateTime": "2016-03-01T15:23:40Z",
+                            "displayName": "John Smith",
+                            "givenName": "John",
+                            "id": "90847c2a-e29d-4d2f-9f54-c5b4d3f26471",
+                            "mail": "john@contoso.com",
+                            "preferredLanguage": "en-us",
+                            "surname": "Smith",
+                            "userPrincipalName": "john@contoso.com",
+                            "userType": "Member"
+                        }
+                    }
+                }
+            }
+            */
             string correlationId = data?.data.authenticationContext.correlationId;
-            string oid = data?.data.authenticationContext.oid;
+            string oid = data?.data.authenticationContext.user.id;
             if(string.IsNullOrEmpty(oid))
             {
                 _logger.LogError("OID is null or empty");
