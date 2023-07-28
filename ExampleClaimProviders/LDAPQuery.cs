@@ -32,12 +32,14 @@ namespace ExampleClaimProviders
 
             // Read the correlation ID from the Azure AD  request    
             string correlationId = data?.data.authenticationContext.correlationId;
+            string upn = data?.data.authenticationContext.user.userPrincipalName;
+
 
             // Claims to return to Azure AD
             ResponseContent r = new ResponseContent();
             r.data.actions[0].claims.CorrelationId = correlationId;
             r.data.actions[0].claims.ApiVersion = "1.0.0";
-            r.data.actions[0].claims.UPN = GetUPNFromLDAP(name);
+            r.data.actions[0].claims.UPN = GetUPNFromLDAP(upn);
             r.data.actions[0].claims.CustomRoles.Add("Writer");
             r.data.actions[0].claims.CustomRoles.Add("Editor");
             return new OkObjectResult(r);
@@ -61,12 +63,12 @@ namespace ExampleClaimProviders
             {
                 System.DirectoryServices.DirectoryEntry entry = new(connectionString);
                 DirectorySearcher searcher = new(entry);
-                searcher.Filter = $"(&(objectClass=user)(sAMAccountName={userName}))";
+                searcher.Filter = $"(&(objectClass=user)(mail={userName}))";
                 SearchResultCollection results = searcher.FindAll();
                 foreach(SearchResult result in results)
                 {
                     DirectoryEntry de = result.GetDirectoryEntry();
-                    if (de.Properties["samAccountName"].Value.ToString().ToLower() == userName.ToLower())
+                    if (!string.IsNullOrEmpty(de.Properties["userPrincipalName"].Value.ToString()))
                     {
                         upn = de.Properties["userPrincipalName"].Value.ToString();
                         break;
